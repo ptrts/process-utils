@@ -1,0 +1,66 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'we'
+version = '001'
+
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.6.4'
+    }
+}
+
+publishing {
+    publications {
+        register('jar', MavenPublication) { MavenPublication mavenPublication ->
+            // Плагин java (на базе которого сделан плагин java-library, который мы здесь используем) уже подготовил нам комплект для публикации
+            // Такие заготовленные комплекты для публикации - это называется компоненты
+            from components.java
+
+            versionMapping {
+                // Если у некой зависимости, в выбранном ее варианте, есть вот такой атрибут
+                //      org.gradle.usage=java-api
+                // то сделать ей версию как в
+                usage('java-api') {
+                    fromResolutionResult()
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+        }
+    }
+    repositories {
+        mavenLocal()
+        maven {
+            name = 's3Private'
+            url = 's3://maven.taruts.net'
+            authentication {
+                register('aws', AwsImAuthentication)
+            }
+        }
+    }
+}
