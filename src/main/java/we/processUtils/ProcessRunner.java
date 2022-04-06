@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class ProcessRunner {
 
     @SneakyThrows
-    public static void runProcess(File directory, String... command) {
+    public static String runProcess(File directory, String... command) {
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.directory(directory);
         Process process = processBuilder.start();
@@ -20,9 +21,15 @@ public class ProcessRunner {
                 BufferedReader input = process.inputReader();
         ) {
             int exitStatus = process.waitFor();
-            if (exitStatus != 0) {
-                input.lines().forEachOrdered(log::info);
-                error.lines().forEachOrdered(log::error);
+
+            String outputText = input.lines().collect(Collectors.joining("\n"));
+            log.info(outputText);
+
+            error.lines().forEachOrdered(log::error);
+
+            if (exitStatus == 0) {
+                return outputText;
+            } else {
                 throw new RuntimeException(command[0] + " exited with status " + exitStatus);
             }
         }
