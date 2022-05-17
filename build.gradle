@@ -34,6 +34,20 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3'
 
     implementation 'org.slf4j:slf4j-api'
+
+    // Test
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+
+    // Test lombok
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // Test slf4j
+    testImplementation 'org.slf4j:slf4j-simple'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 dependencyManagement {

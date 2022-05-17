@@ -26,6 +26,7 @@ public class ProcessRunner {
 
         ProcessBuilder processBuilder = new ProcessBuilder(command);
         processBuilder.directory(directory);
+        processBuilder.inheritIO();
         Process process = processBuilder.start();
 
         try (
@@ -60,7 +61,7 @@ public class ProcessRunner {
 
         List<String> commandsList = new ArrayList<>(Arrays.asList(command));
 
-        String shell = SystemUtils.IS_OS_WINDOWS ? "cmd" : "sh";
+        String shell = SystemUtils.IS_OS_WINDOWS ? null : "sh";
         commandsList.add(0, shell);
 
         String extension = SystemUtils.IS_OS_WINDOWS ? windowsExtension : nixExtension;
@@ -85,6 +86,10 @@ public class ProcessRunner {
 
     public static String runCmd(String scriptFilename, File directory, String... command) {
         return runScript(scriptFilename, "cmd", null, directory, command);
+    }
+
+    public static String runScript(String scriptFilename, File directory, String... command) {
+        return runScript(scriptFilename, null, null, directory, command);
     }
 
     private static String getFilenameWithExtension(String filename, String extension) {
